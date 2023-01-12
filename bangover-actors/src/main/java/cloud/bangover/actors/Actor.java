@@ -1,9 +1,10 @@
 package cloud.bangover.actors;
 
-import cloud.bangover.actors.EventLoop.Worker;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
+
+import cloud.bangover.actors.EventLoop.Worker;
 import lombok.NonNull;
 
 /**
@@ -146,9 +147,9 @@ public abstract class Actor<T> {
    * be processed.
    *
    * @param message The message
-   * @throws Throwable an object, which is reason of the message handling break
+   * @throws Exception an object, which is reason of the message handling break
    */
-  protected abstract void receive(Message<T> message) throws Throwable;
+  protected abstract void receive(Message<T> message) throws Exception;
 
   private void wakeup() {
     this.state = ActorState.BUSY;
@@ -158,7 +159,7 @@ public abstract class Actor<T> {
     this.state = ActorState.ASLEEP;
   }
 
-  private void handleError(Message<T> message, Throwable error) {
+  private void handleError(Message<T> message, Exception error) {
     getFaultResover().resolveError(new LifecycleController() {
       @Override
       public void resume() {
@@ -179,9 +180,9 @@ public abstract class Actor<T> {
 
   class Mailbox {
     public final boolean isEmpty() {
-      return messageQueue.isEmpty(); 
+      return messageQueue.isEmpty();
     }
-    
+
     public final void put(Message<T> message) {
       messageQueue.offer(message);
     }
@@ -199,7 +200,7 @@ public abstract class Actor<T> {
       try {
         receive(message);
         sleep();
-      } catch (Throwable error) {
+      } catch (Exception error) {
         state = ActorState.FAILED;
         handleError(message, error);
       }
@@ -281,7 +282,7 @@ public abstract class Actor<T> {
      * @param message   The message, during which processing the error was happened
      * @param error     The happened error
      */
-    public void resolveError(LifecycleController lifecycle, Message<T> message, Throwable error);
+    public void resolveError(LifecycleController lifecycle, Message<T> message, Exception error);
   }
 
   /**

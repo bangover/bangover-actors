@@ -262,7 +262,7 @@ public class ActorSystemTest {
       return new FaultResolver<Object>() {
         @Override
         public void resolveError(LifecycleController lifecycle, Message<Object> message,
-            Throwable error) {
+            Exception error) {
           tell(Message.createFor(message.getSender(), printerActorAddress, error.getMessage()));
           FaultResolver<Object> faultResolver = faultResolverOptional.orElse(defaultResolver);
           faultResolver.resolveError(lifecycle, message, error);
@@ -285,7 +285,7 @@ public class ActorSystemTest {
       return factory(printerActorAddress, Optional.of(new FaultResolver<Object>() {
         @Override
         public void resolveError(LifecycleController lifecycle, Message<Object> message,
-            Throwable error) {
+            Exception error) {
           lifecycle.restart();
         }
       }));
@@ -296,7 +296,7 @@ public class ActorSystemTest {
       return factory(printerActorAddress, Optional.of(new FaultResolver<Object>() {
         @Override
         public void resolveError(LifecycleController lifecycle, Message<Object> message,
-            Throwable error) {
+            Exception error) {
           lifecycle.restart();
         }
 

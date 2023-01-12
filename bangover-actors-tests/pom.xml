@@ -35,14 +35,14 @@
 		<dependency>
 			<groupId>cloud.bangover.actors</groupId>
 			<artifactId>bangover-actors</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>cloud.bangover.actors</groupId>
 			<artifactId>bangover-actors-testkit</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 

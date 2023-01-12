@@ -1,6 +1,7 @@
 package cloud.bangover.actors;
 
 import java.util.function.Predicate;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -123,10 +124,10 @@ public final class Message<B> {
    * @param expectedBodyType The expected body type class
    * @param matchedReceiver  The message handle function receiver for case when the message body is
    *                         matched to specified typee
-   * 
+   * @throws Exception The thrown error
    */
   public <T> void whenIsMatchedTo(Class<T> expectedBodyType,
-      MessageHandleFunction<T> matchedReceiver) {
+      MessageHandleFunction<T> matchedReceiver) throws Exception {
     whenIsMatchedTo(expectedBodyType, matchedReceiver, body -> {
     });
   }
@@ -140,10 +141,11 @@ public final class Message<B> {
    *                          matched to specified type
    * @param unmatchedReceiver The message handle function receiver for case when the message body is
    *                          unmatched to specified type
-   * 
+   * @throws Exception The thrown error
    */
   public <T> void whenIsMatchedTo(Class<T> expectedBodyType,
-      MessageHandleFunction<T> matchedReceiver, MessageHandleFunction<B> unmatchedReceiver) {
+      MessageHandleFunction<T> matchedReceiver, MessageHandleFunction<B> unmatchedReceiver)
+      throws Exception {
     if (expectedBodyType.isInstance(body)) {
       matchedReceiver.receive(expectedBodyType.cast(body));
     } else {
@@ -157,8 +159,10 @@ public final class Message<B> {
    * @param predicate       The predicate
    * @param matchedReceiver The message handle function receiver for case when the message body is
    *                        matched by the specified predicate
+   * @throws Exception The thrown error
    */
-  public void whenIsMatchedTo(Predicate<B> predicate, MessageHandleFunction<B> matchedReceiver) {
+  public void whenIsMatchedTo(Predicate<B> predicate, MessageHandleFunction<B> matchedReceiver)
+      throws Exception {
     whenIsMatchedTo(predicate, matchedReceiver, body -> {
     });
   }
@@ -171,9 +175,10 @@ public final class Message<B> {
    *                          matched by the specified predicate
    * @param unmatchedReceiver The message handle function receiver for case when the message body is
    *                          unmatched by the specified predicate
+   * @throws Exception The thrown error
    */
   public void whenIsMatchedTo(Predicate<B> predicate, MessageHandleFunction<B> matchedReceiver,
-      MessageHandleFunction<B> unmatchedReceiver) {
+      MessageHandleFunction<B> unmatchedReceiver) throws Exception {
     if (predicate.test(body)) {
       matchedReceiver.receive(body);
     } else {
@@ -216,6 +221,6 @@ public final class Message<B> {
      *
      * @param body The message body
      */
-    public void receive(B body);
+    public void receive(B body) throws Exception;
   }
 }

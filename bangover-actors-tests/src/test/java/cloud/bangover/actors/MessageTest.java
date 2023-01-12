@@ -142,7 +142,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByTypeSuccessfullyWithoutOtherwiseBehavior() {
+  public void shouldMatchMessageByTypeSuccessfullyWithoutOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<String> handleFunction = new MockMessageHandleFunction<String>();
     Message<Object> message = Message.createFor(RECEIVER_ADDRESS, "Hello world!");
@@ -153,7 +153,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByTypeNonSuccessfullyWithoutOtherwiseBehavior() {
+  public void shouldMatchMessageByTypeNonSuccessfullyWithoutOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<String> handleFunction = new MockMessageHandleFunction<String>();
     Message<Object> message = Message.createFor(RECEIVER_ADDRESS, new Object());
@@ -164,7 +164,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByTypeSuccessfullyWithOtherwiseBehavior() {
+  public void shouldMatchMessageByTypeSuccessfullyWithOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<String> handleFunction = new MockMessageHandleFunction<String>();
     MockMessageHandleFunction<Object> otherwiseFunction = new MockMessageHandleFunction<Object>();
@@ -177,7 +177,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByTypeNonSuccessfullyWithOtherwiseBehavior() {
+  public void shouldMatchMessageByTypeNonSuccessfullyWithOtherwiseBehavior() throws Throwable {
     // Given
     Object body = new Object();
     MockMessageHandleFunction<String> handleFunction = new MockMessageHandleFunction<String>();
@@ -191,7 +191,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByPredicateSuccessfullyWithoutOtherwiseBehavior() {
+  public void shouldMatchMessageByPredicateSuccessfullyWithoutOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<Long> handleFunction = new MockMessageHandleFunction<Long>();
     Message<Long> message = Message.createFor(RECEIVER_ADDRESS, 1000L);
@@ -202,7 +202,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByPredicateNonSuccessfullyWithoutOtherwiseBehavior() {
+  public void shouldMatchMessageByPredicateNonSuccessfullyWithoutOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<Long> handleFunction = new MockMessageHandleFunction<Long>();
     Message<Long> message = Message.createFor(RECEIVER_ADDRESS, 1001L);
@@ -213,7 +213,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByPredicateSuccessfullyWithOtherwiseBehavior() {
+  public void shouldMatchMessageByPredicateSuccessfullyWithOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<Long> handleFunction = new MockMessageHandleFunction<Long>();
     MockMessageHandleFunction<Long> otherwiseFunction = new MockMessageHandleFunction<Long>();
@@ -226,7 +226,7 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByPredicateNonSuccessfullyWithOtherwiseBehavior() {
+  public void shouldMatchMessageByPredicateNonSuccessfullyWithOtherwiseBehavior() throws Throwable {
     // Given
     MockMessageHandleFunction<Long> handleFunction = new MockMessageHandleFunction<Long>();
     MockMessageHandleFunction<Long> otherwiseFunction = new MockMessageHandleFunction<Long>();

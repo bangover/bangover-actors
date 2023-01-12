@@ -17,14 +17,43 @@
 
 	<repositories>
 		<repository>
-			<id>bce</id>
-			<name>BCE Repository</name>
-			<url>https://maven.pkg.github.com/bincloud-io/bce</url>
+			<id>central</id>
+			<name>Maven central proxy repository</name>
+			<url>http://nexus.bangover.cloud/repository/maven-central/</url>
+		</repository>
+		
+		<repository>
+			<id>bagover-releases</id>
+			<name>Bangover release repository</name>
+			<url>http://nexus.bangover.cloud/repository/maven-bangover-releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		
+		<repository>
+			<id>bangover-snapshots</id>
+			<name>Bangover snapshots repository</name>
+			<url>http://nexus.bangover.cloud/repository/maven-bangover-snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
 	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus.bagover.cloud</id>
+			<name>Bangover release repository</name>
+			<url>http://nexus.bangover.cloud/repository/maven-bangover-releases/</url>
+		</repository>
+		
+		<snapshotRepository>
+			<id>nexus.bagover.cloud</id>
+			<name>Bangover snapshots repository</name>
+			<url>http://nexus.bangover.cloud/repository/maven-bangover-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,14 +64,6 @@
 		<junit4.version>4.13.1</junit4.version>
 	</properties>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/bincloud-io/bce</url>
-		</repository>
-	</distributionManagement>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -50,6 +71,24 @@
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>cloud.bangover</groupId>
+				<artifactId>bangover-commons</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cloud.bangover</groupId>
+				<artifactId>bangover-commons-testkit</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cloud.bangover.async</groupId>
+				<artifactId>bangover-async</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -62,14 +101,14 @@
 	</dependencyManagement>
 
 	<build>
-	    <plugins>
+		<plugins>
 			<plugin>
-			  <groupId>org.codehaus.mojo</groupId>
-			  <artifactId>versions-maven-plugin</artifactId>
-			  <version>2.14.2</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.14.2</version>
 			</plugin>
 		</plugins>
-	
+
 		<pluginManagement>
 			<plugins>
 				<plugin>

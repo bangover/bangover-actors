@@ -1,12 +1,5 @@
 package cloud.bangover.actors;
 
-import cloud.bangover.actors.Actor.Context;
-import cloud.bangover.actors.Actor.Factory;
-import cloud.bangover.actors.Actor.Mailbox;
-import cloud.bangover.actors.EventLoop.Alarm;
-import cloud.bangover.actors.EventLoop.Dispatcher;
-import cloud.bangover.actors.EventLoop.Worker;
-import cloud.bangover.generators.Generator;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import cloud.bangover.actors.Actor.Context;
+import cloud.bangover.actors.Actor.Factory;
+import cloud.bangover.actors.Actor.Mailbox;
+import cloud.bangover.actors.EventLoop.Alarm;
+import cloud.bangover.actors.EventLoop.Dispatcher;
+import cloud.bangover.actors.EventLoop.Worker;
+import cloud.bangover.generators.Generator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -192,7 +193,7 @@ public class Actors {
     private void dispatchAllAsleepWorkers() {
       if (started && actorsCoordinator.isContainNonEmptyMailbox()) {
         eventLoopExecutorService.execute(() -> {
-          while (actorsCoordinator.isContainNonEmptyMailbox()) {            
+          while (actorsCoordinator.isContainNonEmptyMailbox()) {
             eventLoop.dispatchAsleepWorkers();
           }
         });
