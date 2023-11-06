@@ -1,6 +1,7 @@
 package cloud.bangover.actors;
 
 import cloud.bangover.actors.Message.MessageBodyConverter;
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.EqualsAndHashCode;
 import org.junit.Assert;
@@ -27,7 +28,8 @@ public class MessageTest {
 
   @Test
   public void shouldCreateMessageFromSpecifiedSender() {
-    Message<BodyObject> message = Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
+    Message<BodyObject> message =
+        Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
     Assert.assertEquals(CorrelationKey.UNCORRELATED, message.getCorrelationKey());
     Assert.assertEquals(SENDER_ADDRESS, message.getSender());
     Assert.assertEquals(RECEIVER_ADDRESS, message.getDestination());
@@ -37,8 +39,8 @@ public class MessageTest {
   @Test
   public void shouldCreateMessageWithSpecifiedCorrelationKeyFromUncorrelatedMessage() {
     // Given
-    Message<BodyObject> message = Message
-        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
+    Message<BodyObject> message =
+        Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
     // When
     message = message.correlateBy(ANOTHER_CORRELATION_KEY);
     // Then
@@ -52,8 +54,7 @@ public class MessageTest {
   public void shouldCreateMessageWithSpecifiedCorrelationKeyFromCorrelatedMessage() {
     // Given
     Message<BodyObject> message = Message
-        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject())
-        .correlateBy(CORRELATION_KEY);
+        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject()).correlateBy(CORRELATION_KEY);
     // When
     message = message.correlateBy(ANOTHER_CORRELATION_KEY);
     // Then
@@ -67,8 +68,7 @@ public class MessageTest {
   public void shouldReplaceMessageSender() {
     // Given
     Message<BodyObject> sourceMessage = Message
-        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject())
-        .correlateBy(CORRELATION_KEY);
+        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject()).correlateBy(CORRELATION_KEY);
     // When
     Message<BodyObject> resultMessage = sourceMessage.withSender(ANOTHER_ADDRESS);
     // Then
@@ -83,8 +83,7 @@ public class MessageTest {
   public void shouldReplaceMessageDestination() {
     // Given
     Message<BodyObject> sourceMessage = Message
-        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject())
-        .correlateBy(CORRELATION_KEY);
+        .createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject()).correlateBy(CORRELATION_KEY);
     // When
     Message<BodyObject> resultMessage = sourceMessage.withDestination(ANOTHER_ADDRESS);
     // Then
@@ -98,14 +97,16 @@ public class MessageTest {
   @Test
   public void shouldReplaceMessageBody() {
     // Given
-    Message<BodyObject> sourceMessage = Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
+    Message<BodyObject> sourceMessage =
+        Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
     // When
-    Message<String> resultMessage = sourceMessage.map(new MessageBodyConverter<MessageTest.BodyObject, String>() {
-      @Override
-      public String transform(BodyObject currentBody) {
-        return currentBody.toString();
-      }      
-    });
+    Message<String> resultMessage =
+        sourceMessage.map(new MessageBodyConverter<MessageTest.BodyObject, String>() {
+          @Override
+          public String transform(BodyObject currentBody) {
+            return currentBody.toString();
+          }
+        });
     // Then
     Assert.assertNotSame(sourceMessage, resultMessage);
     Assert.assertEquals(sourceMessage.getSender(), resultMessage.getSender());
@@ -118,7 +119,8 @@ public class MessageTest {
   @Test
   public void shouldReplyMessageToCurrentSender() {
     // Given
-    Message<BodyObject> sourceMessage = Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
+    Message<BodyObject> sourceMessage =
+        Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
     // When
     Message<String> replyMessage = sourceMessage.replyWith("OK");
     // Then
@@ -131,7 +133,8 @@ public class MessageTest {
   @Test
   public void shouldReplyMessageToSpecifiedDestination() {
     // Given
-    Message<BodyObject> sourceMessage = Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
+    Message<BodyObject> sourceMessage =
+        Message.createFor(SENDER_ADDRESS, RECEIVER_ADDRESS, new BodyObject());
     // When
     Message<String> replyMessage = sourceMessage.replyWith(ANOTHER_ADDRESS, "OK");
     // Then
@@ -202,7 +205,8 @@ public class MessageTest {
   }
 
   @Test
-  public void shouldMatchMessageByPredicateNonSuccessfullyWithoutOtherwiseBehavior() throws Throwable {
+  public void shouldMatchMessageByPredicateNonSuccessfullyWithoutOtherwiseBehavior()
+      throws Throwable {
     // Given
     MockMessageHandleFunction<Long> handleFunction = new MockMessageHandleFunction<Long>();
     Message<Long> message = Message.createFor(RECEIVER_ADDRESS, 1001L);
@@ -221,7 +225,7 @@ public class MessageTest {
     // When
     message.whenIsMatchedTo(new EvenPredicate(), handleFunction, otherwiseFunction);
     // Then
-    Assert.assertTrue(handleFunction.getHistory().hasEntry(0, 1000L));    
+    Assert.assertTrue(handleFunction.getHistory().hasEntry(0, 1000L));
     Assert.assertFalse(otherwiseFunction.getHistory().hasEntries());
   }
 
@@ -238,13 +242,40 @@ public class MessageTest {
     Assert.assertTrue(otherwiseFunction.getHistory().hasEntry(0, 1001L));
   }
 
+  private static final String METADATA_KEY = "METADATA_KEY";
+
+  @Test
+  public void shouldMetadataAttributeValueBeEmptyForUnknownKey() {
+    // Given
+    Message<Long> message = Message.createFor(RECEIVER_ADDRESS, 1001L);
+
+    // When
+    Optional<Long> attribute = message.getMetadataAttribute(Long.class, METADATA_KEY);
+
+    // Then
+    Assert.assertEquals(Optional.empty(), attribute);
+  }
+
+  @Test
+  public void shouldMetadataAttributeValueBeReceivedForExistingKey() {
+    // Given
+    Message<Long> message =
+        Message.createFor(RECEIVER_ADDRESS, 1001L).withMetadata(METADATA_KEY, 1L);
+
+    // When
+    Optional<Long> attribute = message.getMetadataAttribute(Long.class, METADATA_KEY);
+
+    // Then
+    Assert.assertEquals(Optional.of(1L), attribute);
+  }
+
   private static class EvenPredicate implements Predicate<Long> {
     @Override
     public boolean test(Long value) {
       return value % 2 == 0;
     }
   }
-  
+
   @EqualsAndHashCode
   private static class BodyObject {
     @Override

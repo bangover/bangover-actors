@@ -1,7 +1,10 @@
 package cloud.bangover.actors;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
-
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +20,12 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Message<B> {
   private final CorrelationKey correlationKey;
   private final ActorAddress sender;
   private final ActorAddress destination;
+  private final Map<String, Object> metadata;
   private final B body;
 
   /**
@@ -32,7 +36,43 @@ public final class Message<B> {
    * @return The result message
    */
   public <T> Message<T> map(MessageBodyConverter<B, T> converter) {
-    return new Message<T>(correlationKey, sender, destination, converter.transform(body));
+    return new Message<T>(correlationKey, sender, destination, getMetadata(),
+        converter.transform(body));
+  }
+
+  /**
+   * Get the metadata attribute with type cast.
+   * 
+   * @param <T>  The attribute type name
+   * @param type The attribute type class
+   * @param key  The attribute key
+   * @return The attribute value wrapped by the {@link Optional}
+   */
+  public <T> Optional<T> getMetadataAttribute(Class<T> type, String key) {
+    return getMetadataAttribute(key).map(type::cast);
+  }
+
+  /**
+   * Get the metadata attribute without type cast.
+   * 
+   * @param key The attribute key
+   * @return The attribute value wrapped by the {@link Optional}
+   */
+  public Optional<Object> getMetadataAttribute(String key) {
+    return Optional.ofNullable(this.getMetadata().get(key));
+  }
+
+  /**
+   * Create the message with appended metadata attribute
+   * 
+   * @param key   The metadata attribute key
+   * @param value The metadata attribute value
+   * @return The message with the metadata attribute
+   */
+  public final Message<B> withMetadata(String key, Object value) {
+    Map<String, Object> derived = new HashMap<String, Object>(getMetadata());
+    derived.put(key, value);
+    return new Message<B>(correlationKey, sender, destination, derived, body);
   }
 
   /**
@@ -43,7 +83,7 @@ public final class Message<B> {
    */
   public final Message<B> correlateBy(CorrelationKey correlationKey) {
     if (isNotCorrelated()) {
-      return new Message<>(correlationKey, sender, destination, body);
+      return new Message<>(correlationKey, sender, destination, getMetadata(), body);
     }
     return this;
   }
@@ -68,7 +108,7 @@ public final class Message<B> {
    * @return The reply message
    */
   public <T> Message<T> replyWith(ActorAddress destination, T replyBody) {
-    return new Message<T>(correlationKey, this.destination, destination, replyBody);
+    return new Message<T>(correlationKey, this.destination, destination, getMetadata(), replyBody);
   }
 
   /**
@@ -78,7 +118,7 @@ public final class Message<B> {
    * @return The message with changed sender
    */
   public Message<B> withSender(ActorAddress sender) {
-    return new Message<>(correlationKey, sender, this.destination, this.body);
+    return new Message<>(correlationKey, sender, this.destination, getMetadata(), this.body);
   }
 
   /**
@@ -88,7 +128,7 @@ public final class Message<B> {
    * @return The message with changed destination
    */
   public Message<B> withDestination(ActorAddress destination) {
-    return new Message<B>(correlationKey, this.sender, destination, this.body);
+    return new Message<B>(correlationKey, this.sender, destination, getMetadata(), this.body);
   }
 
   /**
@@ -114,7 +154,8 @@ public final class Message<B> {
    */
   public static final <B> Message<B> createFor(ActorAddress sender, ActorAddress destination,
       B messageBody) {
-    return new Message<>(CorrelationKey.UNCORRELATED, sender, destination, messageBody);
+    return new Message<>(CorrelationKey.UNCORRELATED, sender, destination, new HashMap<>(),
+        messageBody);
   }
 
   /**
